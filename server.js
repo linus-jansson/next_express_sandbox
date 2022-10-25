@@ -34,7 +34,7 @@ nextApp.prepare().then(async () => {
             ttl: time_to_live
         }),
         secret: process.env.SESSION_SECRET,
-        genid: () => { return uuidv4() }, // BUG: Different for same user on different routes
+        genid: () => { return uuidv4() },
         saveUninitialized: false,
         resave: true,
         cookie: {
@@ -46,21 +46,23 @@ nextApp.prepare().then(async () => {
 
     server.use(express.json());
 
-    /* API router */
+    /* User logs in */
     server.post('/api/login', (req, res) => {
         req.session.authed = true;
         res.status(200).json({ id: req.sessionID, authed: req.session.authed, });
     })
 
-
+    /* User logs out */
     server.get('/api/logout', (req, res) => {
         req.session.destroy();
         req.status(200).json({ status: 'Logged out' });
     })
 
+    /* Check if user is logged in */
     server.get('/api/isloggedin', (req, res) => {
         res.json({ id: req.sessionID, authed: req.session.authed, });
     })
+
 
     /* Handle all requests through next */
     server.get("*", (req, res) => {

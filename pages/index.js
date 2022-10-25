@@ -7,7 +7,6 @@ const IndexPage = (props) => {
 
     useEffect(() => {
         axios.get('/api/isloggedin').then((response) => {
-            console.log("use effect login check", response.data);
             setSessionData(response.data);
         });
     }, [])
