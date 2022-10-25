@@ -1,12 +1,15 @@
+import dotenv from 'dotenv'
+dotenv.config()
+
 import express from 'express'
 import session from 'express-session'
 
 import { v4 as uuidv4 } from 'uuid';
-const SECRET = uuidv4().toString();
 
-import next from 'next';
-import bodyParser from 'body-parser';
-import http from 'http';
+import next from 'next'; // handling next.js instance
+import bodyParser from 'body-parser'; // body parser for post requests
+import http from 'http'; // http server
+import MongoStore from 'connect-mongo'; // session store for mongodb
 
 const server = express();
 const http_server = http.createServer(server);
@@ -24,14 +27,20 @@ nextApp.prepare().then(async () => {
     }));
 
     // https://github.com/expressjs/session
+    let time_to_live = 60 * 60 * 1000; // 1 hour
     server.use(session({
-        secret: SECRET,
+        store: MongoStore.create({
+            mongoUrl: process.env.DB_URL,
+            ttl: time_to_live
+        }),
+        secret: process.env.SESSION_SECRET,
         genid: () => { return uuidv4() }, // BUG: Different for same user on different routes
-        saveUninitialized: true,
-        resave: false,
+        saveUninitialized: false,
+        resave: true,
         cookie: {
             secure: false,
-            maxAge: 1000 * 60 * 10, // 10 minutes
+            maxAge: time_to_live,
+            sameSite: true,
         }
     }))
 

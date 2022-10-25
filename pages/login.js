@@ -2,7 +2,7 @@ import axios from 'axios'
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 
-export default () => {
+let LoginPage = () => {
     const [sessionData, setSessionData] = useState({})
 
     const handleLoginButton = () => {
@@ -30,3 +30,4 @@ export default () => {
 
 }
 
+export default LoginPage

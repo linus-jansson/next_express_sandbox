@@ -1,24 +1,30 @@
 import axios from 'axios';
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
-export default (props) => {
-    const [sessionData, setSessionData] = useState({});
+
+const IndexPage = (props) => {
+    const [sessionData, setSessionData] = useState();
 
     useEffect(() => {
         axios.get('/api/isloggedin').then((response) => {
             console.log("use effect login check", response.data);
             setSessionData(response.data);
         });
-    })
+    }, [])
 
     return (
         <>
             <h1>Very Secret site</h1>
 
-            <p>Session id: {sessionData?.id}</p>
-            <p>logged in: {(sessionData?.authed === true) ? "true" : "false"}</p>
+            <h2>useEffect</h2>
+            <p>&gt;Session id: {sessionData?.id}</p>
+            <p>&gt;Logged in: {(sessionData?.authed === true) ? "true" : "false"}</p>
 
-            <p>is GetServerSideProp id same as useeffect {(props.sessiondata?.id == sessionData?.id) ? "true" : "false"}</p>
+            <h2>getServerSideProps</h2>
+            <p>&gt;Session id: {props.sessionData?.id}</p>
+            <p>&gt;Logged in: {(props.sessionData?.authed === true) ? "true" : "false"}</p>
+
+            <p>is GetServerSideProp id same as useeffect {(props.sessiosData?.id === sessionData?.id) ? "true" : "false"}</p>
 
             <Link href="/login">
                 <a>Login page</a>
@@ -27,10 +33,17 @@ export default (props) => {
     )
 }
 
+export default IndexPage;
+
 export async function getServerSideProps(context) {
-    let response = await axios.get('http://localhost:8000/api/isloggedin', { withCredentials: true });
+    // https://stackoverflow.com/questions/51466982/next-js-express-session-new-session-for-every-request-made-inside-getinitialp
+    let response = await axios.get('http://localhost:8000/api/isloggedin', {
+        headers: {
+            cookie: context.req.headers.cookie, // need to send cookie to server
+        }
+    });
     console.log(response.data);
     return {
-        props: { sessiondata: response.data }, // will be passed to the page component as props
+        props: { sessionData: response.data }, // will be passed to the page component as props
     }
 }
