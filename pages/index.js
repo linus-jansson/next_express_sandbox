@@ -42,7 +42,18 @@ export async function getServerSideProps(context) {
         }
     });
     console.log(response.data);
-    return {
-        props: { sessionData: response.data }, // will be passed to the page component as props
+    if (response.data.authed !== true) {
+        return {
+            redirect: {
+                destination: '/login',
+                permanent: false,
+            },
+        }
     }
+    else {
+        return {
+            props: { sessionData: response.data }, // will be passed to the page component as props
+        }
+    }
+
 }

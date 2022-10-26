@@ -55,7 +55,7 @@ nextApp.prepare().then(async () => {
     /* User logs out */
     server.get('/api/logout', (req, res) => {
         req.session.destroy();
-        req.status(200).json({ status: 'Logged out' });
+        res.status(200).json({ status: 'Logged out' });
     })
 
     /* Check if user is logged in */
